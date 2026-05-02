@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Printer, Trash2, Calendar, MapPin, Trophy, Video, CheckCircle, ArrowUpCircle, Target, Star } from 'lucide-react';
+import { ArrowLeft, Printer, Trash2, Calendar, MapPin, Trophy, Video, CheckCircle, ArrowUpCircle, Target, Star, Download, Loader2 } from 'lucide-react';
 import { useAnalyses, usePlayers } from '../store/AppContext';
 import { getConceptById } from '../data/concepts';
 import { formatDate, getYouTubeEmbedUrl, phaseLabel } from '../utils';
@@ -35,6 +36,47 @@ export default function AnalysisDetail() {
   const topConcepts = [...allRatings].sort((a, b) => b.rating - a.rating).slice(0, 3);
   const bottomConcepts = [...allRatings].sort((a, b) => a.rating - b.rating).slice(0, 3);
 
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    setDownloading(true);
+    try {
+      const { default: jsPDF } = await import('jspdf');
+      const { default: html2canvas } = await import('html2canvas');
+
+      const element = document.getElementById('pdf-content')!;
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#f0f4f8',
+        logging: false,
+        windowWidth: 900,
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      const pageW = pdf.internal.pageSize.getWidth();   // 210 mm
+      const pageH = pdf.internal.pageSize.getHeight();  // 297 mm
+      const margin = 10;
+      const usableW = pageW - margin * 2;
+      const imgH = (canvas.height * usableW) / canvas.width;
+
+      let yOffset = 0;
+      while (yOffset < imgH) {
+        if (yOffset > 0) pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', margin, margin - (yOffset), usableW, imgH);
+        yOffset += pageH - margin * 2;
+      }
+
+      const filename = `XMP_${player.name.replace(/\s+/g, '_')}_${analysis.date}.pdf`;
+      pdf.save(filename);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const handleDelete = () => {
     if (confirm('¿Eliminar este análisis? Esta acción no se puede deshacer.')) {
       deleteAnalysis(analysis.id);
@@ -53,11 +95,22 @@ export default function AnalysisDetail() {
           <button onClick={() => window.print()} className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600">
             <Printer size={15} /> Imprimir
           </button>
+          <button
+            onClick={handleDownloadPdf}
+            disabled={downloading}
+            className="flex items-center gap-2 px-3 py-2 text-sm border border-[#1A3A5C] rounded-xl hover:bg-[#1A3A5C] hover:text-white text-[#1A3A5C] transition-colors disabled:opacity-50"
+          >
+            {downloading ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
+            {downloading ? 'Generando…' : 'Descargar'}
+          </button>
           <button onClick={handleDelete} className="flex items-center gap-2 px-3 py-2 text-sm border border-red-200 rounded-xl hover:bg-red-50 text-red-500">
             <Trash2 size={15} /> Eliminar
           </button>
         </div>
       </div>
+
+      {/* PDF capture area — todo lo que va dentro se imprime/descarga */}
+      <div id="pdf-content" className="space-y-6">
 
       {/* Report header */}
       <div className="bg-[#1A3A5C] text-white rounded-2xl p-6 shadow-md">
@@ -227,6 +280,8 @@ export default function AnalysisDetail() {
       <p className="text-center text-xs text-gray-400 py-4">
         Análisis generado por XMP Football Analysis · {formatDate(analysis.createdAt)}
       </p>
+
+      </div> {/* fin pdf-content */}
     </div>
   );
 }

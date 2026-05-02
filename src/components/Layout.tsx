@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, BarChart3, Menu, X, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Users, BarChart3, Menu, X, ChevronRight, LogOut, ShieldCheck, Eye } from 'lucide-react';
 import Logo from './Logo';
+import { useAuth } from '../store/AuthContext';
 
 const nav = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -12,6 +13,7 @@ const nav = [
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const loc = useLocation();
+  const { user, isAdmin, signOut } = useAuth();
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -40,11 +42,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        <div className="p-4 border-t border-white/10">
-          <div className="text-xs text-blue-300 text-center">
-            XMP Football Analysis<br />
-            <span className="text-blue-400">v1.0.0</span>
+        <div className="p-4 border-t border-white/10 space-y-3">
+          <div className="flex items-center gap-2">
+            {isAdmin
+              ? <ShieldCheck size={14} className="text-[#D67D2E] shrink-0" />
+              : <Eye size={14} className="text-blue-300 shrink-0" />}
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-white font-medium truncate">{user?.email}</p>
+              <p className="text-[10px] text-blue-300">{isAdmin ? 'Administrador' : 'Solo lectura'}</p>
+            </div>
           </div>
+          <button
+            onClick={() => signOut()}
+            className="w-full flex items-center justify-center gap-2 text-xs text-blue-300 hover:text-white hover:bg-white/10 py-2 rounded-lg transition-colors"
+          >
+            <LogOut size={13} /> Cerrar sesión
+          </button>
         </div>
       </aside>
 

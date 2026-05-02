@@ -6,6 +6,7 @@ import {
   Edit2, Save, X,
 } from 'lucide-react';
 import { useAnalyses, usePlayers } from '../store/AppContext';
+import { useAuth } from '../store/AuthContext';
 import { getConcepts, getConceptById } from '../data/concepts';
 import { formatDate, getYouTubeEmbedUrl, phaseLabel, avg } from '../utils';
 import { PlayerAvatar } from './Dashboard';
@@ -18,6 +19,7 @@ export default function AnalysisDetail() {
   const navigate = useNavigate();
   const { getAnalysis, deleteAnalysis, updateAnalysis } = useAnalyses();
   const { getPlayer } = usePlayers();
+  const { isAdmin } = useAuth();
 
   const analysis = getAnalysis(id!);
   const player = analysis ? getPlayer(analysis.playerId) : undefined;
@@ -197,12 +199,14 @@ export default function AnalysisDetail() {
             </>
           ) : (
             <>
-              <button
-                onClick={startEditing}
-                className="flex items-center gap-2 px-3 py-2 text-sm border border-[#D67D2E] rounded-xl hover:bg-orange-50 text-[#D67D2E]"
-              >
-                <Edit2 size={15} /> Editar informe
-              </button>
+              {isAdmin && (
+                <button
+                  onClick={startEditing}
+                  className="flex items-center gap-2 px-3 py-2 text-sm border border-[#D67D2E] rounded-xl hover:bg-orange-50 text-[#D67D2E]"
+                >
+                  <Edit2 size={15} /> Editar informe
+                </button>
+              )}
               <button onClick={() => window.print()} className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600">
                 <Printer size={15} /> Imprimir
               </button>
@@ -214,12 +218,14 @@ export default function AnalysisDetail() {
                 {downloading ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
                 {downloading ? 'Generando…' : 'Descargar'}
               </button>
-              <button
-                onClick={() => setShowDeleteDialog(true)}
-                className="flex items-center gap-2 px-3 py-2 text-sm border border-red-200 rounded-xl hover:bg-red-50 text-red-500"
-              >
-                <Trash2 size={15} /> Eliminar
-              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm border border-red-200 rounded-xl hover:bg-red-50 text-red-500"
+                >
+                  <Trash2 size={15} /> Eliminar
+                </button>
+              )}
             </>
           )}
         </div>

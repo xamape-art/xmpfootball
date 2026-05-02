@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, Filter, ChevronRight, Trash2 } from 'lucide-react';
 import { usePlayers, useAnalyses } from '../store/AppContext';
+import { useAuth } from '../store/AuthContext';
 import { formatDate, trialDaysLeft, positionLabel } from '../utils';
 import { PlayerAvatar } from './Dashboard';
 import Badge from '../components/Badge';
@@ -10,6 +11,7 @@ import type { Position } from '../types';
 export default function PlayerList() {
   const { players, deletePlayer } = usePlayers();
   const { getAnalysesByPlayer } = useAnalyses();
+  const { isAdmin } = useAuth();
   const [search, setSearch] = useState('');
   const [filterPos, setFilterPos] = useState<Position | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<'all' | 'trial' | 'active' | 'inactive'>('all');
@@ -35,13 +37,15 @@ export default function PlayerList() {
           <h1 className="text-2xl font-bold text-[#1A3A5C]">Jugadoras</h1>
           <p className="text-gray-500 text-sm mt-1">{players.length} jugadora{players.length !== 1 ? 's' : ''} registrada{players.length !== 1 ? 's' : ''}</p>
         </div>
-        <Link
-          to="/players/new"
-          className="inline-flex items-center gap-2 bg-[#D67D2E] text-white px-4 py-2.5 rounded-xl font-medium text-sm hover:bg-[#c06a1f] transition-colors shadow-sm"
-        >
-          <Plus size={16} />
-          Nueva jugadora
-        </Link>
+        {isAdmin && (
+          <Link
+            to="/players/new"
+            className="inline-flex items-center gap-2 bg-[#D67D2E] text-white px-4 py-2.5 rounded-xl font-medium text-sm hover:bg-[#c06a1f] transition-colors shadow-sm"
+          >
+            <Plus size={16} />
+            Nueva jugadora
+          </Link>
+        )}
       </div>
 
       {/* Filters */}
@@ -118,22 +122,24 @@ export default function PlayerList() {
                     <ChevronRight size={16} className="text-gray-400 group-hover:text-[#D67D2E] transition-colors" />
                   </div>
                 </Link>
-                <div className="px-5 pb-4">
-                  <div className="flex gap-2">
-                    <Link
-                      to={`/players/${player.id}/analysis/new`}
-                      className="flex-1 text-center text-xs font-medium py-2 rounded-lg bg-[#1A3A5C] text-white hover:bg-[#162f4a] transition-colors"
-                    >
-                      + Análisis
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(player.id, player.name)}
-                      className="p-2 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                {isAdmin && (
+                  <div className="px-5 pb-4">
+                    <div className="flex gap-2">
+                      <Link
+                        to={`/players/${player.id}/analysis/new`}
+                        className="flex-1 text-center text-xs font-medium py-2 rounded-lg bg-[#1A3A5C] text-white hover:bg-[#162f4a] transition-colors"
+                      >
+                        + Análisis
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(player.id, player.name)}
+                        className="p-2 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             );
           })}

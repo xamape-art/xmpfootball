@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit, Plus, Calendar, Mail, Phone, Globe, FileText, Clock, TrendingUp, Activity } from 'lucide-react';
 import { usePlayers, useAnalyses } from '../store/AppContext';
+import { useAuth } from '../store/AuthContext';
 import { formatDate, trialDaysLeft, positionLabel, avg } from '../utils';
 import { PlayerAvatar } from './Dashboard';
 import Badge from '../components/Badge';
@@ -24,6 +25,7 @@ export default function PlayerDetail() {
     );
   }
 
+  const { isAdmin } = useAuth();
   const analyses = getAnalysesByPlayer(player.id);
   const days = trialDaysLeft(player.trialStartDate);
   const ratings = analyses.map(a => a.overallRating).filter(r => r > 0);
@@ -55,14 +57,16 @@ export default function PlayerDetail() {
               {player.side && <Badge variant="gray">{player.side}</Badge>}
             </div>
           </div>
-          <div className="flex gap-2">
-            <Link to={`/players/${player.id}/edit`} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-sm font-medium transition-colors">
-              <Edit size={14} /> Editar
-            </Link>
-            <Link to={`/players/${player.id}/analysis/new`} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#D67D2E] hover:bg-[#c06a1f] text-sm font-medium transition-colors shadow">
-              <Plus size={14} /> Nuevo análisis
-            </Link>
-          </div>
+          {isAdmin && (
+            <div className="flex gap-2">
+              <Link to={`/players/${player.id}/edit`} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-sm font-medium transition-colors">
+                <Edit size={14} /> Editar
+              </Link>
+              <Link to={`/players/${player.id}/analysis/new`} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#D67D2E] hover:bg-[#c06a1f] text-sm font-medium transition-colors shadow">
+                <Plus size={14} /> Nuevo análisis
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
@@ -169,7 +173,7 @@ export default function PlayerDetail() {
                 )}
               </button>
             </div>
-            {activeTab === 'historial' && (
+            {activeTab === 'historial' && isAdmin && (
               <Link to={`/players/${player.id}/analysis/new`} className="text-sm text-[#D67D2E] hover:underline flex items-center gap-1">
                 <Plus size={13} /> Nuevo
               </Link>

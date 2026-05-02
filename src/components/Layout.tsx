@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, BarChart3, Menu, X, ChevronRight, LogOut, ShieldCheck, Eye } from 'lucide-react';
+import { LayoutDashboard, Users, BarChart3, UserCog, Menu, X, ChevronRight, LogOut, ShieldCheck, Eye } from 'lucide-react';
 import Logo from './Logo';
 import { useAuth } from '../store/AuthContext';
 
@@ -41,6 +41,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
+          {isAdmin && (
+            <Link
+              to="/admin/users"
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                loc.pathname.startsWith('/admin')
+                  ? 'bg-[#D67D2E] text-white shadow-md'
+                  : 'text-blue-100 hover:bg-white/10'
+              }`}
+            >
+              <UserCog size={18} />
+              Usuarios
+              {loc.pathname.startsWith('/admin') && <ChevronRight size={14} className="ml-auto" />}
+            </Link>
+          )}
         </nav>
         <div className="p-4 border-t border-white/10 space-y-3">
           <div className="flex items-center gap-2">
@@ -90,6 +104,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </Link>
               );
             })}
+            {isAdmin && (
+              <Link
+                to="/admin/users"
+                onClick={() => setOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                  loc.pathname.startsWith('/admin') ? 'bg-[#D67D2E] text-white' : 'text-blue-100 hover:bg-white/10'
+                }`}
+              >
+                <UserCog size={18} /> Usuarios
+              </Link>
+            )}
           </aside>
         </div>
       )}

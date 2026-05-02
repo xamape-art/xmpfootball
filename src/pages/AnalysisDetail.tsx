@@ -237,6 +237,7 @@ export default function AnalysisDetail() {
             </div>
             <Logo variant="white" size="md" />
           </div>
+          {/* Fila 1: fecha, fase y datos del partido */}
           <div className="mt-4 pt-4 border-t border-white/10 flex flex-wrap gap-x-8 gap-y-2">
             <InfoItem icon={<Calendar size={13} />} label="Fecha" value={formatDate(analysis.date)} />
             <InfoItem icon={<Target size={13} />} label="Fase" value={phaseLabel(analysis.phase)} />
@@ -245,13 +246,20 @@ export default function AnalysisDetail() {
             {analysis.matchInfo.result && <InfoItem icon={<Star size={13} />} label="Resultado" value={analysis.matchInfo.result} />}
             {analysis.matchInfo.venue && <InfoItem icon={<MapPin size={13} />} label="Sede" value={analysis.matchInfo.venue} />}
           </div>
-        </div>
-
-        {/* Score cards */}
-        <div data-pdf-section className="grid grid-cols-3 gap-4">
-          <ScoreCard label="Valoración global" value={analysis.overallRating.toFixed(1)} sub={<StarRating value={Math.round(analysis.overallRating)} readonly size={16} />} highlight />
-          <ScoreCard label="Conceptos evaluados" value={allRatings.length} sub={`de ${analysis.offensiveRatings.length + analysis.defensiveRatings.length} totales`} />
-          <ScoreCard label="Fase" value={phaseLabel(analysis.phase)} sub={formatDate(analysis.date)} />
+          {/* Fila 2: valoración global y conceptos evaluados */}
+          <div className="mt-3 pt-3 border-t border-white/10 flex items-center gap-6 flex-wrap">
+            <div className="flex items-center gap-3">
+              <p className="text-blue-300 text-[10px] uppercase tracking-wide">Valoración global</p>
+              <span className="text-[#D67D2E] font-bold text-2xl leading-none">{analysis.overallRating.toFixed(1)}</span>
+              <StarRating value={Math.round(analysis.overallRating)} readonly size={14} />
+            </div>
+            <div className="w-px h-5 bg-white/20 shrink-0" />
+            <div className="flex items-center gap-3">
+              <p className="text-blue-300 text-[10px] uppercase tracking-wide">Conceptos evaluados</p>
+              <span className="text-white font-bold text-2xl leading-none">{allRatings.length}</span>
+              <span className="text-blue-300 text-xs">/ {analysis.offensiveRatings.length + analysis.defensiveRatings.length}</span>
+            </div>
+          </div>
         </div>
 
         {/* Video — skipped in PDF, can't capture iframe */}
@@ -539,18 +547,6 @@ function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string
     <div>
       <p className="text-blue-300 text-[10px] flex items-center gap-1 uppercase tracking-wide">{icon}{label}</p>
       <p className="text-white text-sm font-semibold mt-0.5">{value}</p>
-    </div>
-  );
-}
-
-function ScoreCard({ label, value, sub, highlight }: {
-  label: string; value: string | number; sub: React.ReactNode; highlight?: boolean;
-}) {
-  return (
-    <div className={`rounded-2xl p-4 text-center ${highlight ? 'bg-[#1A3A5C] text-white' : 'bg-white border border-gray-100 shadow-sm'}`}>
-      <p className={`text-xs font-medium mb-1 ${highlight ? 'text-blue-300' : 'text-gray-500'}`}>{label}</p>
-      <p className={`text-3xl font-bold ${highlight ? 'text-[#D67D2E]' : 'text-[#1A3A5C]'}`}>{value}</p>
-      <div className={`text-xs mt-1 ${highlight ? 'text-blue-300' : 'text-gray-400'}`}>{sub}</div>
     </div>
   );
 }

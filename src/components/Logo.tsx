@@ -4,7 +4,7 @@ interface LogoProps {
 }
 
 export default function Logo({ variant = 'color', size = 'md' }: LogoProps) {
-  const sizes = { sm: 80, md: 120, lg: 180 };
+  const sizes = { sm: 110, md: 160, lg: 220 };
   const w = sizes[size];
   const h = w * (260 / 600);
   const navy = variant === 'white' ? '#FFFFFF' : '#1A3A5C';

@@ -121,7 +121,7 @@ export default function AnalysisDetail() {
         const canvas = await html2canvas(el, {
           scale: 2,
           useCORS: true,
-          backgroundColor: null,
+          backgroundColor: '#ffffff',
           logging: false,
           windowWidth: 900,
         });
@@ -235,15 +235,15 @@ export default function AnalysisDetail() {
                 <p className="text-blue-200 text-sm">{player.team} · {player.position === 'delantera' ? 'Delantera' : 'Extremo'}</p>
               </div>
             </div>
-            <Logo variant="white" size="sm" />
+            <Logo variant="white" size="md" />
           </div>
-          <div className="mt-5 pt-5 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="mt-4 pt-4 border-t border-white/10 flex flex-wrap gap-x-8 gap-y-2">
             <InfoItem icon={<Calendar size={13} />} label="Fecha" value={formatDate(analysis.date)} />
+            <InfoItem icon={<Target size={13} />} label="Fase" value={phaseLabel(analysis.phase)} />
             {analysis.matchInfo.opponent && <InfoItem icon={<Trophy size={13} />} label="Rival" value={analysis.matchInfo.opponent} />}
             {analysis.matchInfo.competition && <InfoItem icon={<Target size={13} />} label="Competición" value={analysis.matchInfo.competition} />}
             {analysis.matchInfo.result && <InfoItem icon={<Star size={13} />} label="Resultado" value={analysis.matchInfo.result} />}
             {analysis.matchInfo.venue && <InfoItem icon={<MapPin size={13} />} label="Sede" value={analysis.matchInfo.venue} />}
-            <InfoItem icon={<Target size={13} />} label="Fase" value={phaseLabel(analysis.phase)} />
           </div>
         </div>
 
@@ -537,8 +537,8 @@ function ConfirmDialog({ title, message, confirmLabel, onConfirm, onCancel }: {
 function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div>
-      <p className="text-blue-300 text-xs flex items-center gap-1">{icon}{label}</p>
-      <p className="text-white text-sm font-semibold mt-0.5 truncate">{value}</p>
+      <p className="text-blue-300 text-[10px] flex items-center gap-1 uppercase tracking-wide">{icon}{label}</p>
+      <p className="text-white text-sm font-semibold mt-0.5">{value}</p>
     </div>
   );
 }

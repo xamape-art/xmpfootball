@@ -48,6 +48,10 @@ export default function AnalysisDetail() {
   const allRatings = [...analysis.offensiveRatings, ...analysis.defensiveRatings].filter(r => r.rating > 0);
   const topConcepts = [...allRatings].sort((a, b) => b.rating - a.rating).slice(0, 3);
   const bottomConcepts = [...allRatings].sort((a, b) => a.rating - b.rating).filter(r => r.rating > 0).slice(0, 3);
+  // Total de conceptos disponibles según posición y fase (catálogo real, no los guardados)
+  const totalConcepts =
+    (analysis.phase !== 'defensivo' ? getConcepts(player.position, 'ofensivo').length : 0) +
+    (analysis.phase !== 'ofensivo' ? getConcepts(player.position, 'defensivo').length : 0);
 
   // ── Edit helpers ──────────────────────────────────────────────────────────
 
@@ -228,7 +232,7 @@ export default function AnalysisDetail() {
         <div data-pdf-section className="bg-[#1A3A5C] text-white rounded-2xl p-6 shadow-md">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex items-center gap-4">
-              <PlayerAvatar name={player.name} photo={player.photoUrl} size="md" />
+              <PlayerAvatar name={player.name} photo={player.photoUrl} size="xl" />
               <div>
                 <p className="text-blue-300 text-xs font-medium uppercase tracking-wide mb-1">Informe de análisis individual</p>
                 <h1 className="text-xl font-bold">{player.name}</h1>
@@ -257,7 +261,7 @@ export default function AnalysisDetail() {
             <div className="flex items-center gap-3">
               <p className="text-blue-300 text-[10px] uppercase tracking-wide">Conceptos evaluados</p>
               <span className="text-white font-bold text-2xl leading-none">{allRatings.length}</span>
-              <span className="text-blue-300 text-xs">/ {analysis.offensiveRatings.length + analysis.defensiveRatings.length}</span>
+              <span className="text-blue-300 text-xs">/ {totalConcepts}</span>
             </div>
           </div>
         </div>

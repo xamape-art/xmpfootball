@@ -167,8 +167,8 @@ function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label:
   );
 }
 
-export function PlayerAvatar({ name, photo, size = 'sm' }: { name: string; photo?: string; size?: 'sm' | 'md' | 'lg' }) {
-  const sizeClass = size === 'lg' ? 'w-16 h-16 text-xl' : size === 'md' ? 'w-10 h-10 text-base' : 'w-8 h-8 text-sm';
+export function PlayerAvatar({ name, photo, size = 'sm' }: { name: string; photo?: string; size?: 'sm' | 'md' | 'lg' | 'xl' }) {
+  const sizeClass = size === 'xl' ? 'w-20 h-20 text-2xl' : size === 'lg' ? 'w-16 h-16 text-xl' : size === 'md' ? 'w-10 h-10 text-base' : 'w-8 h-8 text-sm';
   if (photo) {
     return <img src={photo} alt={name} className={`${sizeClass} rounded-full object-cover border-2 border-white shadow-sm`} />;
   }

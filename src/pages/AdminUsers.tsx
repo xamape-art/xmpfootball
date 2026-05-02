@@ -25,7 +25,7 @@ function generatePassword() {
 }
 
 export default function AdminUsers() {
-  const { user: adminUser } = useAuth();
+  useAuth();
   const [users, setUsers] = useState<AppUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -53,39 +53,23 @@ export default function AdminUsers() {
 
   useEffect(() => { loadUsers(); }, []);
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleCreate = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!email || !password) { setFormError('Email y contraseña son obligatorios'); return; }
     if (password.length < 6) { setFormError('La contraseña debe tener al menos 6 caracteres'); return; }
     setFormError('');
     setCreating(true);
 
-    const { data, error } = await supabase.auth.signUp({ email: email.trim().toLowerCase(), password });
-
-    if (error) {
-      setFormError(error.message.includes('already registered')
-        ? 'Este email ya tiene una cuenta'
-        : error.message);
-      setCreating(false);
-      return;
-    }
-
-    if (!data.user) {
-      setFormError('No se pudo crear el usuario. Verifica que la confirmación de email esté desactivada en Supabase.');
-      setCreating(false);
-      return;
-    }
-
-    // Register in app_users table
-    const { error: insertError } = await supabase.from('app_users').insert({
-      id: data.user.id,
-      email: email.trim().toLowerCase(),
-      display_name: name.trim() || null,
-      created_by: adminUser?.email,
+    const { data, error } = await supabase.functions.invoke('create-app-user', {
+      body: {
+        email: email.trim().toLowerCase(),
+        password,
+        display_name: name.trim() || null,
+      },
     });
 
-    if (insertError) {
-      setFormError('Usuario Auth creado pero no se pudo registrar en la tabla. Puede que ya exista.');
+    if (error || data?.error) {
+      setFormError(data?.error ?? error?.message ?? 'Error al crear el usuario');
       setCreating(false);
       return;
     }

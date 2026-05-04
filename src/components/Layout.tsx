@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, BarChart3, UserCog, Menu, X, ChevronRight, LogOut, ShieldCheck, Eye } from 'lucide-react';
+import { LayoutDashboard, Users, BarChart3, UserCog, Menu, X, ChevronRight, LogOut, ShieldCheck, Eye, UserCircle } from 'lucide-react';
 import Logo from './Logo';
 import { useAuth } from '../store/AuthContext';
+import { usePlayers } from '../store/AppContext';
 
 const nav = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -14,6 +15,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const loc = useLocation();
   const { user, isAdmin, signOut } = useAuth();
+  const { players } = usePlayers();
+  const myPlayer = isAdmin ? null : players.find(p => p.email === user?.email);
+  const myProfilePath = myPlayer ? `/players/${myPlayer.id}` : null;
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -23,38 +27,47 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Logo variant="white" size="md" />
         </div>
         <nav className="flex-1 py-6 px-3 space-y-1">
-          {nav.map(({ to, icon: Icon, label }) => {
-            const active = loc.pathname === to || (to !== '/' && loc.pathname.startsWith(to));
-            return (
+          {isAdmin ? (
+            <>
+              {nav.map(({ to, icon: Icon, label }) => {
+                const active = loc.pathname === to || (to !== '/' && loc.pathname.startsWith(to));
+                return (
+                  <Link
+                    key={to}
+                    to={to}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                      active ? 'bg-[#D67D2E] text-white shadow-md' : 'text-blue-100 hover:bg-white/10'
+                    }`}
+                  >
+                    <Icon size={18} />
+                    {label}
+                    {active && <ChevronRight size={14} className="ml-auto" />}
+                  </Link>
+                );
+              })}
               <Link
-                key={to}
-                to={to}
+                to="/admin/users"
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                  active
-                    ? 'bg-[#D67D2E] text-white shadow-md'
-                    : 'text-blue-100 hover:bg-white/10'
+                  loc.pathname.startsWith('/admin') ? 'bg-[#D67D2E] text-white shadow-md' : 'text-blue-100 hover:bg-white/10'
                 }`}
               >
-                <Icon size={18} />
-                {label}
-                {active && <ChevronRight size={14} className="ml-auto" />}
+                <UserCog size={18} />
+                Usuarios
+                {loc.pathname.startsWith('/admin') && <ChevronRight size={14} className="ml-auto" />}
               </Link>
-            );
-          })}
-          {isAdmin && (
+            </>
+          ) : myProfilePath ? (
             <Link
-              to="/admin/users"
+              to={myProfilePath}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                loc.pathname.startsWith('/admin')
-                  ? 'bg-[#D67D2E] text-white shadow-md'
-                  : 'text-blue-100 hover:bg-white/10'
+                loc.pathname.startsWith(myProfilePath) ? 'bg-[#D67D2E] text-white shadow-md' : 'text-blue-100 hover:bg-white/10'
               }`}
             >
-              <UserCog size={18} />
-              Usuarios
-              {loc.pathname.startsWith('/admin') && <ChevronRight size={14} className="ml-auto" />}
+              <UserCircle size={18} />
+              Mi perfil
+              {loc.pathname.startsWith(myProfilePath) && <ChevronRight size={14} className="ml-auto" />}
             </Link>
-          )}
+          ) : null}
         </nav>
         <div className="p-4 border-t border-white/10 space-y-3">
           <div className="flex items-center gap-2">
@@ -88,33 +101,45 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="lg:hidden fixed inset-0 z-40" onClick={() => setOpen(false)}>
           <div className="absolute inset-0 bg-black/50" />
           <aside className="absolute left-0 top-0 h-full w-64 bg-[#1A3A5C] text-white pt-16 px-3 space-y-1" onClick={e => e.stopPropagation()}>
-            {nav.map(({ to, icon: Icon, label }) => {
-              const active = loc.pathname === to || (to !== '/' && loc.pathname.startsWith(to));
-              return (
+            {isAdmin ? (
+              <>
+                {nav.map(({ to, icon: Icon, label }) => {
+                  const active = loc.pathname === to || (to !== '/' && loc.pathname.startsWith(to));
+                  return (
+                    <Link
+                      key={to}
+                      to={to}
+                      onClick={() => setOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                        active ? 'bg-[#D67D2E] text-white' : 'text-blue-100 hover:bg-white/10'
+                      }`}
+                    >
+                      <Icon size={18} />
+                      {label}
+                    </Link>
+                  );
+                })}
                 <Link
-                  key={to}
-                  to={to}
+                  to="/admin/users"
                   onClick={() => setOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                    active ? 'bg-[#D67D2E] text-white' : 'text-blue-100 hover:bg-white/10'
+                    loc.pathname.startsWith('/admin') ? 'bg-[#D67D2E] text-white' : 'text-blue-100 hover:bg-white/10'
                   }`}
                 >
-                  <Icon size={18} />
-                  {label}
+                  <UserCog size={18} /> Usuarios
                 </Link>
-              );
-            })}
-            {isAdmin && (
+              </>
+            ) : myProfilePath ? (
               <Link
-                to="/admin/users"
+                to={myProfilePath}
                 onClick={() => setOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                  loc.pathname.startsWith('/admin') ? 'bg-[#D67D2E] text-white' : 'text-blue-100 hover:bg-white/10'
+                  loc.pathname.startsWith(myProfilePath) ? 'bg-[#D67D2E] text-white' : 'text-blue-100 hover:bg-white/10'
                 }`}
               >
-                <UserCog size={18} /> Usuarios
+                <UserCircle size={18} /> Mi perfil
               </Link>
-            )}
+            ) : null}
           </aside>
         </div>
       )}

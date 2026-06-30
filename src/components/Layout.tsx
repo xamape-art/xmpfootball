@@ -145,10 +145,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Main content */}
-      <main className="flex-1 lg:ml-64 pt-14 lg:pt-0 min-h-screen">
-        <div className="p-4 lg:p-8 max-w-7xl mx-auto">
+      <main className="flex-1 lg:ml-64 pt-14 lg:pt-0 min-h-screen flex flex-col">
+        <div className="p-4 lg:p-8 max-w-7xl mx-auto w-full flex-1">
           {children}
         </div>
+        <footer className="border-t border-gray-200 py-6 px-4">
+          <div className="flex flex-col items-center justify-center gap-2">
+            <Logo variant="color" size="sm" />
+            <p className="text-xs text-gray-500">
+              © {new Date().getFullYear()} XMP Football Analysis
+            </p>
+          </div>
+        </footer>
       </main>
     </div>
   );
